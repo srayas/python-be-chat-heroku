@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -121,14 +121,28 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 ASGI_APPLICATION ="core.routing.application"
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
+STATICFILE_DIRS =[os.path.join(BASE_DIR,"static")]
 CHANNEL_LAYERS = {
-        "default":{
-                "BACKEND":"channels.layers.InMemoryChannelLayer"
-        }
+    "default":{
+        "BACKEND":"channels.redis.core.RedisChannelLayer",
+        "CONFIG":{
+                "hosts":[os.environ.get('REDIS_URL','redis://localhost:6379') ],
+        },
+    },
 }
-# Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+CACHES = {
+    "default":{
+        "BACKEND":"django_redis.cache.RedisCache",
+        "LOCATION":[os.environ.get('REDIS_URL','redis://localhost:6379') ],
+        "OPTIONS":{
+                "CLIENT_CLASS":"django_redi.client.DefaultClient"
+        }
+    }
+}
+# # Default primary key field type
+# # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
